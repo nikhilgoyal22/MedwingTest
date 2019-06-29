@@ -1,24 +1,19 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
 * System dependencies
+   * redis
 
 * Configuration
+  * `bundle install`
+  * change `database.yml` for your credentials
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
+* Database creation & initialization
+  * `rails db:create db:migrate db:seed`
 
 * Deployment instructions
+  * `redis-server`
+  * `bundle exec sidekiq`
+  * `rails s`
 
-* ...
+* How to run the test suite
+  * `rspec`
