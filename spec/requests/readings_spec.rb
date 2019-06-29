@@ -91,7 +91,6 @@ RSpec.describe "Readings", type: :request do
 
       get readings_path, params: { number: 2, household_token: @thermostat.household_token }
       expect(response).to have_http_status(200)
-      expect(JSON.parse(response.body)['reading']['number']).to eq(2)
       expect(JSON.parse(response.body)['reading']['temperature'].to_f).to eq(reading_params2[:temperature])
     end 
   end

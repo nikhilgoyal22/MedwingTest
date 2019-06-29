@@ -42,6 +42,6 @@ class ReadingsController < ApplicationController
     reading = $redis.get("#{@thermostat.id}@#{params[:number]}")
     @reading = eval(reading) and return unless reading.nil?
     attrs = %w[temperature humidity battery_charge]
-    @reading = Reading.find_by(thermostat: @thermostat, number: params[:number]).attributes.slice(*attrs)
+    @reading = Reading.find_by(thermostat: @thermostat, number: params[:number])&.attributes&.slice(*attrs)
   end
 end
