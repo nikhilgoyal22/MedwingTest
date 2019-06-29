@@ -4,20 +4,20 @@ class ReadingsController < ApplicationController
   before_action :validate_params, only: [:create]
 
   def index
-    render json: { message: "No data for given reading number" }, status: 404 and return if @reading.nil?
-    render json: { reading: @reading }
+    error_response("Invalid reading number", 404) and return if @reading.nil?
+    json_response({ reading: @reading })
   end
 
   def create
     number = ReadingCachingService.new(reading_params, @thermostat).save
     ReadingJob.perform_later(reading_params, @thermostat.id, number)
-    render json: { reading: { number: number } }, status: 201
+    json_response({ reading: { number: number } }, 201)
   end
 
   def stats
     stats = $redis.get("thermo_stats_#{@thermostat.id}")
     statistics = stats.nil? ? {} : eval(stats)
-    render json: { statistics: statistics }
+    json_response({ statistics: statistics })
   end
 
   private
@@ -27,17 +27,18 @@ class ReadingsController < ApplicationController
   end
 
   def find_thermostat
-    render json: { message: 'Missing Token' }, status: 422 and return if params[:household_token].blank?
+    error_response('Missing Token') and return if params[:household_token].blank?
     @thermostat = Thermostat.find_by(household_token: params[:household_token])
-    render json: { message: 'Unauthorised Token' }, status: 401 and return if @thermostat.nil?
+    error_response('Unauthorised Token', 401) and return if @thermostat.nil?
   end
 
   def validate_params
     @reading = Reading.new(reading_params.merge({thermostat_id: @thermostat.id}))
-    render json: { message: @reading.errors.full_messages.to_sentence }, status: 422 and return unless @reading.valid?
+    error_response(@reading.errors.full_messages.to_sentence) and return unless @reading.valid?
   end
 
   def find_reading
+    error_response('Missing Reading Number') and return if params[:number].blank?
     reading = $redis.get("#{@thermostat.id}@#{params[:number]}")
     @reading = eval(reading) and return unless reading.nil?
     attrs = "temperature, humidity, battery_charge, number, thermostat_id"
