@@ -8,7 +8,7 @@ class ReadingCachingService
 
   def save 
     $redis.set("#{@thermostat_id}_last_number", @number)
-    $redis.set("#{@thermostat_id}@#{@number}", @reading.merge(number: @number, thermostat_id: @thermostat_id))
+    $redis.set("#{@thermostat_id}@#{@number}", @reading)
     update_statistics
     @number
   end

@@ -41,7 +41,7 @@ class ReadingsController < ApplicationController
     error_response('Missing Reading Number') and return if params[:number].blank?
     reading = $redis.get("#{@thermostat.id}@#{params[:number]}")
     @reading = eval(reading) and return unless reading.nil?
-    attrs = "temperature, humidity, battery_charge, number, thermostat_id"
-    @reading = Reading.select(attrs).find_by(thermostat: @thermostat, number: params[:number])
+    attrs = %w[temperature humidity battery_charge]
+    @reading = Reading.find_by(thermostat: @thermostat, number: params[:number]).attributes.slice(*attrs)
   end
 end
